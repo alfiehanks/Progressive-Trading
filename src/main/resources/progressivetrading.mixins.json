@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.alfie.progressivetrading.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MerchantMenuMixin",
+    "MerchantScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

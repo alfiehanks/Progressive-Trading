@@ -1,0 +1,13 @@
+{
+  "itemGroup.progressivetrading": "Example Mod Tab",
+  "block.progressivetrading.example_block": "Example Block",
+  "item.progressivetrading.example_item": "Example Item",
+
+  "progressivetrading.configuration.title": "Progressive Trading Configs",
+  "progressivetrading.configuration.section.progressivetrading.common.toml": "Progressive Trading Configs",
+  "progressivetrading.configuration.section.progressivetrading.common.toml.title": "Progressive Trading Configs",
+  "progressivetrading.configuration.items": "Item List",
+  "progressivetrading.configuration.logDirtBlock": "Log Dirt Block",
+  "progressivetrading.configuration.magicNumberIntroduction": "Magic Number Text",
+  "progressivetrading.configuration.magicNumber": "Magic Number"
+}
