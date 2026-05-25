@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:book"}, "count": 1
+  },
+  "2": {
+    "ingredient": {"tag": "c:dyes"}, "count": 8
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:string"}, "count": 12
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:clock"}, "count": 1
+  }
+}

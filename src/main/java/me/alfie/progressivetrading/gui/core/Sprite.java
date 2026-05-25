@@ -2,9 +2,13 @@ package me.alfie.progressivetrading.gui.core;
 
 import me.alfie.progressivetrading.ProgressiveTrading;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.npc.Villager;
 
 public enum Sprite {
-    LEVEL_UP_BUTTON("textures/gui/sprites/level_up_button.png", 22, 22);
+    VILLAGER_LEVEL_UP_GUI("textures/gui/container/villager_level_up.png", 512, 256),
+    CLOSE_MENU("textures/gui/sprites/close_menu.png", 14, 14),
+    CLOSE_MENU_ACTIVE("textures/gui/sprites/close_menu_active.png", 14, 14)
+    ;
 
     private final ResourceLocation id;
     private final int width;

@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:book"}, "count": 1
+  },
+  "2": {
+    "ingredient": {"item": "minecraft:glistering_melon_slice"}, "count": 6
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:blaze_powder"}, "count": 4
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:crying_obsidian"}, "count": 4
+  }
+}

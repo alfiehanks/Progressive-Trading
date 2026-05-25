@@ -27,7 +27,15 @@ sourceSets.main.resources {
 }
 
 repositories {
-    // Add here additional repositories if required by some of the dependencies below.
+    mavenCentral()
+
+    maven {
+        url = "https://maven.neoforged.net/releases"
+    }
+
+    maven {
+        url = "https://cursemaven.com"
+    }
 }
 
 base {
@@ -118,8 +126,7 @@ configurations {
 }
 
 dependencies {
-    //Replace with maven lib link
-    implementation files("libs/alfinosdatapacks-1.0.0-neoforge-1.21.1.jar")
+    compileOnly "curse.maven:alfinos-datapacks-1553018:8140866"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

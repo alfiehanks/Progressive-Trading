@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:book"}, "count": 1
+  },
+  "2": {
+    "ingredient": {"item": "minecraft:item_frame"}, "count": 4
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:iron_axe"}, "count": 1
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:sponge"}, "count": 4
+  }
+}

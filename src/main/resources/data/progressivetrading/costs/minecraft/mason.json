@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:book"}, "count": 1
+  },
+  "2": {
+    "ingredient": {"item": "minecraft:iron_ingot"}, "count": 3
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:furnace"}, "count": 1
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:nether_brick"}, "count": 12
+  }
+}

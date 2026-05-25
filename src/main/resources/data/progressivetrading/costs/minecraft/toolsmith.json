@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:book"}, "count": 1
+  },
+  "2": {
+    "ingredient": {"item": "minecraft:furnace"}, "count": 1
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:lava_bucket"}, "count": 1
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:enchanting_table"}, "count": 1
+  }
+}

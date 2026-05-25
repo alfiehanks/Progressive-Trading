@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:string"}, "count": 10
+  },
+  "2": {
+    "ingredient": {"item": "minecraft:feather"}, "count": 4
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:crossbow"}, "count": 1
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:leather"}, "count": 10
+  }
+}

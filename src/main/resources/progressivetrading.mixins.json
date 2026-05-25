@@ -4,10 +4,15 @@
   "package": "me.alfie.progressivetrading.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "MerchantMenuMixin",
-    "MerchantScreenMixin"
+    "MerchantMenuLayoutMixin",
+    "VillagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "AddWidgetAccessor",
+    "MerchantScreenLayoutMixin",
+    "MerchantScreenRenderMixin"
+  ]
 }

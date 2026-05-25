@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"tag": "minecraft:fence_gate"}, "count": 1
+  },
+  "2": {
+    "ingredient": {"item": "minecraft:charcoal"}, "count": 20
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:golden_carrot"}, "count": 8
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:diamond_axe"}, "count": 1
+  }
+}

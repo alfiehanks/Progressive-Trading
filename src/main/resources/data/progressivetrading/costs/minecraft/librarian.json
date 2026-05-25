@@ -1,0 +1,14 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:writable_book"}, "count": 1
+  },
+  "2": {
+    "ingredient": {"item": "minecraft:clock"}, "count": 1
+  },
+  "3": {
+    "ingredient": {"item": "minecraft:glowstone"}, "count": 8
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:enchanting_table"}, "count": 1
+  }
+}

@@ -1,13 +1,11 @@
 {
-  "itemGroup.progressivetrading": "Example Mod Tab",
-  "block.progressivetrading.example_block": "Example Block",
-  "item.progressivetrading.example_item": "Example Item",
-
-  "progressivetrading.configuration.title": "Progressive Trading Configs",
-  "progressivetrading.configuration.section.progressivetrading.common.toml": "Progressive Trading Configs",
-  "progressivetrading.configuration.section.progressivetrading.common.toml.title": "Progressive Trading Configs",
-  "progressivetrading.configuration.items": "Item List",
-  "progressivetrading.configuration.logDirtBlock": "Log Dirt Block",
-  "progressivetrading.configuration.magicNumberIntroduction": "Magic Number Text",
-  "progressivetrading.configuration.magicNumber": "Magic Number"
+  "progressivetrading.gui.label.xp_level": "Villager Experience",
+  "progressivetrading.gui.button.level_up": "Level Up Available!",
+  "progressivetrading.gui.villager_level_up": "%s",
+  "progressivetrading.gui.label.villager_level_up_from_to": "Level-Up -> %s",
+  "progressivetrading.gui.label.unlocks_trades": "Unlocks Trades",
+  "progressivetrading.gui.label.requires_item": "Cost:",
+  "progressivetrading.gui.tooltip.confirm_level_up": "Click to level up this villager!",
+  "progressivetrading.gui.tooltip.invalid_cost": "Not enough items!",
+  "progressivetrading.gui.tooltip.back": "Back to Trades"
 }

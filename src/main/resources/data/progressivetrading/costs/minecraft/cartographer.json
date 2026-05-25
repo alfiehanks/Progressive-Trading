@@ -1,0 +1,20 @@
+{
+  "1": {
+    "ingredient": {"item": "minecraft:compass"}, "count": 1
+  },
+  "2": {
+    "ingredient": [
+      { "item": "minecraft:chiseled_sandstone" },
+      { "item": "minecraft:chiseled_red_sandstone" },
+      { "item": "minecraft:chiseled_nether_bricks" },
+      { "item": "minecraft:chiseled_quartz_block" },
+      { "item": "minecraft:chiseled_copper" }
+    ], "count": 12
+  },
+  "3": {
+    "ingredient": {"tag": "c:drinks/ominous"}, "count": 1
+  },
+  "4": {
+    "ingredient": {"item": "minecraft:pitcher_plant"}, "count": 4
+  }
+}
