@@ -1,40 +1,39 @@
 package me.alfie.progressivetrading.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.alfie.alfinosdatapacks.api.DatapackRegistry;
+import me.alfie.alfinolib.gui.CommonAbstractContainerScreen;
+import me.alfie.alfinolib.gui.GuiGraphicsX;
+import me.alfie.alfinolib.gui.util.GuiGraphicsApi;
+import me.alfie.alfinolib.gui.util.MousePos;
+import me.alfie.alfinolib.networking.Networking;
 import me.alfie.progressivetrading.ProgressiveTrading;
 import me.alfie.progressivetrading.ProgressiveTradingClient;
-import me.alfie.progressivetrading.datapack.CostDatapack;
 import me.alfie.progressivetrading.datapack.CostRegistry;
 import me.alfie.progressivetrading.datapack.codec.ItemCost;
 import me.alfie.progressivetrading.gui.common.CommonRenderUtils;
-import me.alfie.progressivetrading.gui.core.HoverableItemStack;
 import me.alfie.progressivetrading.gui.core.Sprite;
 import me.alfie.progressivetrading.networking.LevelUpVillagerPacket;
 import me.alfie.progressivetrading.networking.OpenMerchantMenuPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector2i;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class VillagerLevelUpScreen extends AbstractContainerScreen<@NotNull VillagerLevelUpMenu> {
+public class VillagerLevelUpScreen extends CommonAbstractContainerScreen<@NotNull VillagerLevelUpMenu> {
 
     private int CLOSE_BUTTON_LEFT;
     private int CLOSE_BUTTON_TOP;
@@ -46,9 +45,10 @@ public class VillagerLevelUpScreen extends AbstractContainerScreen<@NotNull Vill
     //private ItemStack requiredItem;
     private ItemCost validCosts = ItemCost.EMPTY;
 
-    public VillagerLevelUpScreen(@NotNull VillagerLevelUpMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = 276;
+    private final Component REQUIRES_COMPONENT = Component.translatable("progressivetrading.gui.label.requires_item");
+
+    public VillagerLevelUpScreen(@NotNull VillagerLevelUpMenu menu, Inventory inventory, Component title) {
+        super(menu, inventory, title, 276, 166);
         this.inventoryLabelX = 107;
 
 
@@ -90,12 +90,13 @@ public class VillagerLevelUpScreen extends AbstractContainerScreen<@NotNull Vill
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
-
+    public void renderBackground(GuiGraphicsX gx, MousePos mousePos, float partialTick) {
         RenderSystem.enableBlend();
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
-        graphics.blit(
+
+        //This overload not currently in AlfinoLib to blit background sprite.
+        gx.graphics().blit(
                 ResourceLocation.fromNamespaceAndPath(ProgressiveTrading.MODID,
                         "textures/gui/container/villager_level_up.png"),
                 x, y,
@@ -105,109 +106,104 @@ public class VillagerLevelUpScreen extends AbstractContainerScreen<@NotNull Vill
                 512, 256);
         RenderSystem.disableBlend();
 
-        boolean isHoveringCloseButton = isMouseOver(
-                CLOSE_BUTTON_LEFT, CLOSE_BUTTON_TOP,
-                Sprite.CLOSE_MENU_ACTIVE.width(), Sprite.CLOSE_MENU_ACTIVE.height(),
-                mouseX, mouseY);
+        boolean isMouseOverCloseButton = mousePos.isOver(CLOSE_BUTTON_LEFT, CLOSE_BUTTON_TOP, 14, 14);
+        Sprite closeButton = isMouseOverCloseButton ? Sprite.CLOSE_MENU_ACTIVE : Sprite.CLOSE_MENU;
 
-        Sprite closeButton = isHoveringCloseButton ? Sprite.CLOSE_MENU_ACTIVE : Sprite.CLOSE_MENU;
         confirmButton.active = validCosts.anyMatch(getMenu().getItemInSlot())
-                                && getMenu().getItemInSlot().getCount() >= validCosts.count();
+                && getMenu().getItemInSlot().getCount() >= validCosts.count();
 
 
-        graphics.blit(
+        GuiGraphicsApi.blit(
+                gx,
                 closeButton.id(),
                 CLOSE_BUTTON_LEFT, CLOSE_BUTTON_TOP,
-                0, 0,
-                Sprite.CLOSE_MENU.width(), Sprite.CLOSE_MENU.height(),
-                Sprite.CLOSE_MENU.width(), Sprite.CLOSE_MENU.height()
+                14, 14
         );
 
-        CommonRenderUtils.renderVillagerPortrait(this, graphics, mouseX, mouseY);
+        CommonRenderUtils.renderVillagerPortrait(this, gx.graphics(), mousePos.x(), mousePos.y());
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
+    public void render(GuiGraphicsX gx, MousePos mousePos, float partialTick) {
+        super.render(gx, mousePos, partialTick);
 
-        if(isMouseOver(CLOSE_BUTTON_LEFT, CLOSE_BUTTON_TOP, 14, 14, mouseX, mouseY)) {
-            graphics.renderTooltip(font, Component.translatable("progressivetrading.gui.tooltip.back"), mouseX, mouseY);
+        if(mousePos.isOver(CLOSE_BUTTON_LEFT, CLOSE_BUTTON_TOP, 14, 14)) {
+            //No renderTooltip in AlfinoLib GraphicsApi
+            gx.graphics().renderTooltip(font, Component.translatable("progressivetrading.gui.tooltip.back"),
+                    mousePos.x(), mousePos.y());
         }
 
-        super.renderTooltip(graphics, mouseX, mouseY);
+        super.renderTooltip(gx.graphics(), mousePos.x(), mousePos.y());
+        Vector2i pos = calculateRequiresLabel();
+        final int itemX = getGuiLeft() + pos.x() + font.width(REQUIRES_COMPONENT);
+        final int itemY = getGuiTop() + pos.y() - 4;
+
+        List<ItemStack> stacks = validCosts.getItems();
+        GuiGraphicsApi.itemStackWithTooltipCycled(gx, stacks, font, itemX, itemY, mousePos, 700);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        this.titleLabelX = 49 + this.imageWidth / 2 - this.font.width(this.title) / 2
-                + ProgressiveTrading.MERCHANT_SHIFT_X;
+    public void renderLabels(GuiGraphicsX gx, MousePos mousePos) {
+        this.titleLabelX = 49 + this.imageWidth / 2 - this.font.width(this.title) / 2 + ProgressiveTrading.MERCHANT_SHIFT_X;
         this.titleLabelY = 6;
-        super.renderLabels(graphics, mouseX, mouseY);
+        super.renderLabels(gx, mousePos);
 
-        //Draw "Unlocks Trades" above trades box
-        Component unlocksTrades = Component.translatable("progressivetrading.gui.label.unlocks_trades");
-        final int x = 5 - font.width(unlocksTrades) / 2 + 48;
-        graphics.drawString(font, unlocksTrades, x, titleLabelY, 4210752, false);
+        //"Unlocks Trades" above trades box
+        Component unlocksTrades = Component.translatable("progressivetrading.gui.label.unlocks_trades")
+                .withColor(4210752);
 
-        //Add "Old Profession -> New Profession" label below title
+        final int labelX1 = 5 - font.width(unlocksTrades) / 2 + 48;
+        GuiGraphicsApi.text(gx, font, unlocksTrades, labelX1, titleLabelY, false);
+
+        //"Level-Up" -> New Profession" label
         if(ProgressiveTradingClient.lastInteractedVillager instanceof Villager villager) {
             int traderLevel = villager.getVillagerData().getLevel();
 
-            Component currentLevel = CommonRenderUtils.buildLevelComponent(traderLevel)
-                    .copy().withColor(CommonRenderUtils.TraderLevelColors.getColorForLevel(traderLevel));
             Component nextLevel = CommonRenderUtils.buildLevelComponent(traderLevel+1)
                     .copy().withColor(4210752);
 
-            Component fromToProfession = Component.translatable("progressivetrading.gui.label.villager_level_up_from_to",
-                    nextLevel);
+            Component fromToProfession = Component.translatable("progressivetrading.gui.label.villager_level_up_from_to", nextLevel)
+                    .withColor(4210752);
 
-            final int fromToX = 49 + this.imageWidth / 2 - this.font.width(fromToProfession) / 2
+            final int labelX2 = 49 + this.imageWidth / 2 - this.font.width(fromToProfession) / 2
                     + ProgressiveTrading.MERCHANT_SHIFT_X;
-            graphics.drawString(font, fromToProfession, fromToX, titleLabelY + font.lineHeight,
-                    4210752, false);
+            final int labelY1 = titleLabelY + font.lineHeight;
+            GuiGraphicsApi.text(gx, font, fromToProfession,
+                    labelX2, labelY1, false);
+
         }
 
-        //Add "Requires" label
-        Component requiresLabel = Component.translatable("progressivetrading.gui.label.requires_item");
-        final int requiresX = 49 + this.imageWidth / 2 - this.font.width(requiresLabel) / 2
-                + ProgressiveTrading.MERCHANT_SHIFT_X - 8;
-        final int y = titleLabelY + font.lineHeight*2 + 4;
+        //"Requires" label
+        Component requiresLabel = REQUIRES_COMPONENT.copy().withColor(4210752);
 
-        graphics.drawString(font, requiresLabel, requiresX, y, 4210752, false);
+        Vector2i pos = calculateRequiresLabel();
 
-        final int itemX = requiresX + font.width(requiresLabel) + 2;
-        final int itemY = y - 4;
+        GuiGraphicsApi.text(gx, font, requiresLabel,
+                pos.x(), pos.y(), false);
 
 
-        List<ItemStack> stacks = validCosts.getItems();
 
-        final HoverableItemStack item = new HoverableItemStack(
-                this, getCycledElement(stacks));
-
-        item.setPos(itemX, itemY);
-        item.render(graphics, mouseX - getGuiLeft(), mouseY - getGuiTop());
     }
 
-    public boolean isMouseOver(double x, double y, int width, int height, double mouseX, double mouseY) {
-        return mouseX >= x && mouseX < x + width
-                && mouseY >= y && mouseY < y + height;
+    private Vector2i calculateRequiresLabel() {
+        final int x = 49 + this.imageWidth / 2 - this.font.width(REQUIRES_COMPONENT) / 2 + ProgressiveTrading.MERCHANT_SHIFT_X - 8;
+        final int y = titleLabelY + font.lineHeight*2 + 4;
+        return new Vector2i(x, y);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(isMouseOver(CLOSE_BUTTON_LEFT, CLOSE_BUTTON_TOP,
-                Sprite.CLOSE_MENU.width(), Sprite.CLOSE_MENU.height(),
-                mouseX, mouseY)) {
-
-            PacketDistributor.sendToServer(new OpenMerchantMenuPacket(
+    public boolean onMouseClick(MousePos mousePos, int button) {
+        if(mousePos.isOver(CLOSE_BUTTON_LEFT, CLOSE_BUTTON_TOP, 14, 14)) {
+            Networking.sendToServer(new OpenMerchantMenuPacket(
                     ProgressiveTradingClient.lastInteractedVillager.getId()
             ));
-        }
+            return true;
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        }
+        return super.onMouseClick(mousePos, button);
     }
 
-    private class FakeTradeButton extends Button {
+    private static class FakeTradeButton extends Button {
 
         private final VillagerLevelUpScreen screen;
         private final MerchantOffer offer;
@@ -225,21 +221,19 @@ public class VillagerLevelUpScreen extends AbstractContainerScreen<@NotNull Vill
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(graphics, mouseX, mouseY, partialTick);
 
+            GuiGraphicsX gx = new GuiGraphicsX(graphics);
+            MousePos mousePos = new MousePos(mouseX, mouseY);
+
             ItemStack costA = offer.getCostA();
             ItemStack costB = offer.getCostB();
             ItemStack result = offer.getResult();
 
-            HoverableItemStack itemStackA = new HoverableItemStack(this.screen, costA);
-            HoverableItemStack itemStackB = new HoverableItemStack(this.screen, costB);
-            HoverableItemStack itemStackResult = new HoverableItemStack(this.screen, result);
-
-            itemStackA.setPos(screen.getGuiLeft() + 10, y);
-            itemStackB.setPos(screen.getGuiLeft() +  40, y);
-            itemStackResult.setPos(screen.getGuiLeft() +  73, y);
-
-            itemStackA.render(graphics, mouseX, mouseY);
-            itemStackB.render(graphics, mouseX, mouseY);
-            itemStackResult.render(graphics, mouseX, mouseY);
+            GuiGraphicsApi.itemStackWithTooltip(gx, costA, Minecraft.getInstance().font,
+                    screen.getGuiLeft() + 10, y, mousePos);
+            GuiGraphicsApi.itemStackWithTooltip(gx, costB, Minecraft.getInstance().font,
+                    screen.getGuiLeft() + 40, y, mousePos);
+            GuiGraphicsApi.itemStackWithTooltip(gx, result, Minecraft.getInstance().font,
+                    screen.getGuiLeft() + 73, y, mousePos);
 
             RenderSystem.enableBlend();
             graphics.blitSprite(ResourceLocation.withDefaultNamespace("container/villager/trade_arrow"),
@@ -269,12 +263,13 @@ public class VillagerLevelUpScreen extends AbstractContainerScreen<@NotNull Vill
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(graphics, mouseX, mouseY, partialTick);
+            MousePos mousePos = new MousePos(mouseX, mouseY);
 
             graphics.blitSprite(
                     ResourceLocation.withDefaultNamespace("container/beacon/confirm"),
                     x + 1, y - 1, 0, 18, 18);
 
-            if(screen.isMouseOver(x, y, width, height, mouseX, mouseY)) {
+            if(mousePos.isOver(x, y, width, height)) {
                 Component tooltip = active ?
                         Component.translatable("progressivetrading.gui.tooltip.confirm_level_up") :
                         Component.translatable("progressivetrading.gui.tooltip.invalid_cost");

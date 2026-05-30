@@ -2,12 +2,12 @@ package me.alfie.progressivetrading.datapack.codec;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import me.alfie.alfinolib.networking.codec.StreamCodec;
 import me.alfie.progressivetrading.ProgressiveTrading;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
@@ -33,35 +33,34 @@ public record ItemCost(Ingredient ingredient, int count, DataComponentPatch comp
 
             ).apply(instance, ItemCost::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ItemCost> STREAM_CODEC =
-            StreamCodec.of(
-                    ItemCost::encodeStream,
-                    ItemCost::decodeStream
-            );
 
-    private static ItemCost decodeStream(RegistryFriendlyByteBuf buf) {
 
-        Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
-        int count = buf.readVarInt();
+    public static final StreamCodec<RegistryFriendlyByteBuf, ItemCost> STREAM_CODEC = new StreamCodec<RegistryFriendlyByteBuf, ItemCost>() {
+        @Override
+        public void encode(RegistryFriendlyByteBuf buf, ItemCost itemCost) {
+            Ingredient.CONTENTS_STREAM_CODEC.encode(buf, itemCost.ingredient());
+            buf.writeVarInt(itemCost.count());
 
-        boolean hasComponents = buf.readBoolean();
+            boolean hasComponents = itemCost.components() != null && !itemCost.components().isEmpty();
+            buf.writeBoolean(hasComponents);
 
-        DataComponentPatch components = hasComponents
-                ? DataComponentPatch.STREAM_CODEC.decode(buf)
-                : DataComponentPatch.EMPTY;
+            if (hasComponents) DataComponentPatch.STREAM_CODEC.encode(buf, itemCost.components());
+        }
 
-        return new ItemCost(ingredient, count, components);
-    }
+        @Override
+        public ItemCost decode(RegistryFriendlyByteBuf buf) {
+            Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+            int count = buf.readVarInt();
 
-    private static void encodeStream(RegistryFriendlyByteBuf buf, ItemCost value) {
-        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, value.ingredient());
-        buf.writeVarInt(value.count());
+            boolean hasComponents = buf.readBoolean();
 
-        boolean hasComponents = value.components() != null && !value.components().isEmpty();
-        buf.writeBoolean(hasComponents);
+            DataComponentPatch components = hasComponents
+                    ? DataComponentPatch.STREAM_CODEC.decode(buf)
+                    : DataComponentPatch.EMPTY;
 
-        if (hasComponents) DataComponentPatch.STREAM_CODEC.encode(buf, value.components());
-    }
+            return new ItemCost(ingredient, count, components);
+        }
+    };
 
     public List<ItemStack> getItems() {
         return Arrays.stream(ingredient.getItems())

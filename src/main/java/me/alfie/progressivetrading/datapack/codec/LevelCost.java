@@ -1,8 +1,8 @@
 package me.alfie.progressivetrading.datapack.codec;
 
 import com.mojang.serialization.Codec;
+import me.alfie.alfinolib.networking.codec.StreamCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,36 +30,33 @@ public record LevelCost(Map<Integer, ItemCost> levelCostMap) {
                                 return stringMap;
                             }
                     );
+    public static final StreamCodec<RegistryFriendlyByteBuf, LevelCost> STREAM_CODEC = new StreamCodec<RegistryFriendlyByteBuf, LevelCost>() {
+                @Override
+                public void encode(RegistryFriendlyByteBuf buf, LevelCost levelCost) {
+                    Map<Integer, ItemCost> map = levelCost.levelCostMap();
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, LevelCost> STREAM_CODEC =
-            StreamCodec.of(
-                    LevelCost::encodeStream,
-                    LevelCost::decodeStream
-            );
+                    buf.writeVarInt(map.size());
 
-    private static LevelCost decodeStream(RegistryFriendlyByteBuf buf) {
-        int size = buf.readVarInt();
-        Map<Integer, ItemCost> map = new HashMap<>(size);
+                    for (Map.Entry<Integer, ItemCost> entry : map.entrySet()) {
+                        buf.writeVarInt(entry.getKey());
+                        ItemCost.STREAM_CODEC.encode(buf, entry.getValue());
+                    }
+                }
 
-        for (int i = 0; i < size; i++) {
-            int level = buf.readVarInt();
-            ItemCost cost = ItemCost.STREAM_CODEC.decode(buf);
-            map.put(level, cost);
-        }
+                @Override
+                public LevelCost decode(RegistryFriendlyByteBuf buf) {
+                    int size = buf.readVarInt();
+                    Map<Integer, ItemCost> map = new HashMap<>(size);
 
-        return new LevelCost(map);
-    }
+                    for (int i = 0; i < size; i++) {
+                        int level = buf.readVarInt();
+                        ItemCost cost = ItemCost.STREAM_CODEC.decode(buf);
+                        map.put(level, cost);
+                    }
 
-    private static void encodeStream(RegistryFriendlyByteBuf buf, LevelCost value) {
-        Map<Integer, ItemCost> map = value.levelCostMap();
-
-        buf.writeVarInt(map.size());
-
-        for (Map.Entry<Integer, ItemCost> entry : map.entrySet()) {
-            buf.writeVarInt(entry.getKey());
-            ItemCost.STREAM_CODEC.encode(buf, entry.getValue());
-        }
-    }
+                    return new LevelCost(map);
+                }
+            };
 
     public ItemCost getLevel(int level) {
         if (!levelCostMap.containsKey(level)) return ItemCost.EMPTY;

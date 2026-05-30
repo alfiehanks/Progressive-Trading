@@ -20,21 +20,7 @@ public class ModEvents {
         NeoForge.EVENT_BUS.addListener(ModEvents::onMerchantInteract);
 
         modEventBus.addListener(ModMenus::registerScreens);
-        modEventBus.addListener(ModEvents::registerPackets);
 
-        NeoForge.EVENT_BUS.addListener(CostDatapack::register);
-    }
-
-    public static void registerPackets(RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToServer(OpenLevelUpMenuPacket.TYPE, OpenLevelUpMenuPacket.STREAM_CODEC,
-                (packet, context) -> packet.exec(context.player()));
-
-        registrar.playToServer(OpenMerchantMenuPacket.TYPE, OpenMerchantMenuPacket.STREAM_CODEC,
-                (packet, context) -> packet.exec(context.player()));
-
-        registrar.playToServer(LevelUpVillagerPacket.TYPE, LevelUpVillagerPacket.STREAM_CODEC,
-                (packet, context) -> packet.exec(context.player()));
     }
 
     public static void onMerchantInteract(PlayerInteractEvent.EntityInteract event) {

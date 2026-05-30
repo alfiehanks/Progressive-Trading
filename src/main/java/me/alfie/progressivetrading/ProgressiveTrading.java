@@ -1,8 +1,14 @@
 package me.alfie.progressivetrading;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import me.alfie.alfinolib.networking.NetworkRegisterEvent;
+import me.alfie.alfinolib.networking.Networking;
+import me.alfie.progressivetrading.datapack.CostDatapack;
 import me.alfie.progressivetrading.event.ModEvents;
 import me.alfie.progressivetrading.gui.ModMenus;
+import me.alfie.progressivetrading.networking.LevelUpVillagerPacket;
+import me.alfie.progressivetrading.networking.OpenLevelUpMenuPacket;
+import me.alfie.progressivetrading.networking.OpenMerchantMenuPacket;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,6 +24,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
+import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
@@ -41,7 +48,19 @@ public class ProgressiveTrading {
     public ProgressiveTrading(IEventBus modEventBus, ModContainer modContainer) {
         ModEvents.register(modEventBus);
         ModMenus.register(modEventBus);
+
+        NeoForge.EVENT_BUS.addListener(CostDatapack::register);
+        modEventBus.addListener(ProgressiveTrading::registerPackets);
     }
+
+    public static void registerPackets(NetworkRegisterEvent event) {
+        event.register(Networking.Side.SERVER, LevelUpVillagerPacket.TYPE, LevelUpVillagerPacket.STREAM_CODEC);
+        event.register(Networking.Side.SERVER, OpenLevelUpMenuPacket.TYPE, OpenLevelUpMenuPacket.STREAM_CODEC);
+        event.register(Networking.Side.SERVER, OpenMerchantMenuPacket.TYPE, OpenMerchantMenuPacket.STREAM_CODEC);
+    }
+
+
+
 
     public static boolean canLevelUp(int traderLevel, int traderXp) {
         return VillagerData.canLevelUp(traderLevel) && traderXp >= VillagerData.getMaxXpPerLevel(traderLevel);

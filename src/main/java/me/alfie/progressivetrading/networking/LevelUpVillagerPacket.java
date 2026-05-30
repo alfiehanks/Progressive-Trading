@@ -1,56 +1,50 @@
 package me.alfie.progressivetrading.networking;
 
 import io.netty.buffer.ByteBuf;
+import me.alfie.alfinolib.networking.NetworkPacket;
+import me.alfie.alfinolib.networking.codec.CommonCodecs;
+import me.alfie.alfinolib.networking.codec.StreamCodec;
+import me.alfie.alfinolib.networking.codec.StreamCodecBuilder;
+import me.alfie.alfinolib.util.ResourceId;
 import me.alfie.progressivetrading.ProgressiveTrading;
 import me.alfie.progressivetrading.datapack.CostRegistry;
 import me.alfie.progressivetrading.datapack.codec.ItemCost;
 import me.alfie.progressivetrading.gui.VillagerLevelUpMenu;
 import me.alfie.progressivetrading.gui.common.CommonRenderUtils;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerData;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record LevelUpVillagerPacket(int villagerEntityId) implements CustomPacketPayload {
+public record LevelUpVillagerPacket(int villagerEntityId) implements NetworkPacket<LevelUpVillagerPacket> {
+
     public static Type<LevelUpVillagerPacket> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(ProgressiveTrading.MODID, "level_up_villager")
+            new ResourceId(ProgressiveTrading.MODID, "level_up_villager").mc()
     );
+    @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
 
-    public static StreamCodec<ByteBuf, LevelUpVillagerPacket> STREAM_CODEC =
-            StreamCodec.composite(
-                    ByteBufCodecs.VAR_INT, LevelUpVillagerPacket::villagerEntityId,
-                    LevelUpVillagerPacket::new
-            );
+    public static StreamCodec<RegistryFriendlyByteBuf, LevelUpVillagerPacket> STREAM_CODEC =
+            StreamCodecBuilder.<RegistryFriendlyByteBuf, LevelUpVillagerPacket>create()
+                    .add(CommonCodecs.VAR_INT, LevelUpVillagerPacket::villagerEntityId)
+                    .build(LevelUpVillagerPacket::new);
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-
-    public void exec(Player player) {
+    public void exec(IPayloadContext context) {
+        Player player = context.player();
         Level level = player.level();
         if(level.isClientSide()) return;
 
         Entity entity = level.getEntity(villagerEntityId());
         if(entity instanceof Villager villager) {
             boolean playerVerified = villager.getTradingPlayer() != null &&
-            villager.getTradingPlayer() == player;
+                    villager.getTradingPlayer() == player;
 
 
             if(player.containerMenu instanceof VillagerLevelUpMenu menu) {

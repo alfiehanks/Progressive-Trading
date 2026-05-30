@@ -86,9 +86,9 @@ config="${mod_id}.mixins.json"
 
 [[dependencies.${mod_id}]] #optional
 # the modid of the dependency
-modId="alfinosdatapacks" #mandatory
+modId="alfinolib" #mandatory
 type="required"
-versionRange="[1.0.0,)"
+versionRange="[1.1.4,)"
 ordering="NONE"
 side="BOTH"
 

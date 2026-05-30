@@ -1,12 +1,17 @@
 package me.alfie.progressivetrading.networking;
 
 import io.netty.buffer.ByteBuf;
+import me.alfie.alfinolib.networking.NetworkPacket;
+import me.alfie.alfinolib.networking.codec.CommonCodecs;
+import me.alfie.alfinolib.networking.codec.StreamCodec;
+import me.alfie.alfinolib.networking.codec.StreamCodecBuilder;
+import me.alfie.alfinolib.util.ResourceId;
 import me.alfie.progressivetrading.ProgressiveTrading;
 import me.alfie.progressivetrading.gui.VillagerLevelUpMenu;
 import me.alfie.progressivetrading.gui.common.CommonRenderUtils;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,24 +21,23 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record OpenLevelUpMenuPacket(int villagerEntityId) implements CustomPacketPayload {
+public record OpenLevelUpMenuPacket(int villagerEntityId) implements NetworkPacket<OpenLevelUpMenuPacket> {
 
     public static final Type<OpenLevelUpMenuPacket> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(ProgressiveTrading.MODID, "open_level_up_menu")
+            new ResourceId(ProgressiveTrading.MODID, "open_level_up_menu").mc()
     );
-
-    public static final StreamCodec<ByteBuf, OpenLevelUpMenuPacket> STREAM_CODEC =
-            StreamCodec.composite(
-                    ByteBufCodecs.VAR_INT, OpenLevelUpMenuPacket::villagerEntityId,
-                    OpenLevelUpMenuPacket::new
-            );
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
+    @Override public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
-    public void exec(Player player) {
+    public static final StreamCodec<RegistryFriendlyByteBuf, OpenLevelUpMenuPacket> STREAM_CODEC =
+            StreamCodecBuilder.<RegistryFriendlyByteBuf, OpenLevelUpMenuPacket>create()
+                    .add(CommonCodecs.VAR_INT, OpenLevelUpMenuPacket::villagerEntityId)
+                    .build(OpenLevelUpMenuPacket::new);
+
+    @Override
+    public void exec(IPayloadContext context) {
+        Player player = context.player();
         if(player instanceof ServerPlayer serverPlayer) {
             if(player.level().getEntity(villagerEntityId) instanceof Villager villager) {
 
@@ -50,8 +54,6 @@ public record OpenLevelUpMenuPacket(int villagerEntityId) implements CustomPacke
 
                 villager.setTradingPlayer(player);
             }
-
-
         }
     }
 }

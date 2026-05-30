@@ -1,5 +1,6 @@
 package me.alfie.progressivetrading.gui.core;
 
+import me.alfie.alfinolib.util.ResourceId;
 import me.alfie.progressivetrading.ProgressiveTrading;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.Villager;
@@ -10,17 +11,17 @@ public enum Sprite {
     CLOSE_MENU_ACTIVE("textures/gui/sprites/close_menu_active.png", 14, 14)
     ;
 
-    private final ResourceLocation id;
+    private final ResourceId id;
     private final int width;
     private final int height;
 
     Sprite(String path, int width, int height) {
-        this.id = ResourceLocation.fromNamespaceAndPath(ProgressiveTrading.MODID, path);
+        this.id = new ResourceId(ProgressiveTrading.MODID, path);
         this.width = width;
         this.height = height;
     }
 
-    public ResourceLocation id() {
+    public ResourceId id() {
         return id;
     }
 

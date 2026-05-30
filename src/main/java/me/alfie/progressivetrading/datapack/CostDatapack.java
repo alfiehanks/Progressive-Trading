@@ -1,9 +1,9 @@
 package me.alfie.progressivetrading.datapack;
 
 import com.google.gson.JsonElement;
-import me.alfie.alfinosdatapacks.api.DatapackKey;
-import me.alfie.alfinosdatapacks.api.DatapackRegistry;
-import me.alfie.alfinosdatapacks.api.ModDatapack;
+import me.alfie.alfinolib.datapacks.DatapackKey;
+import me.alfie.alfinolib.datapacks.DatapackRegistry;
+import me.alfie.alfinolib.datapacks.ModDatapack;
 import me.alfie.progressivetrading.ProgressiveTrading;
 import me.alfie.progressivetrading.datapack.codec.ItemCost;
 import me.alfie.progressivetrading.datapack.codec.LevelCost;
@@ -69,5 +69,6 @@ public class CostDatapack extends ModDatapack<LevelCost, CostRegistry> {
 
     public static void register(AddReloadListenerEvent event) {
         DatapackRegistry.register(event, CostDatapack::new);
+        System.out.println(DatapackRegistry.get(KEY));
     }
 }

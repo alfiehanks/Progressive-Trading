@@ -126,7 +126,8 @@ configurations {
 }
 
 dependencies {
-    compileOnly "curse.maven:alfinos-datapacks-1553018:8140866"
+    compileOnly "curse.maven:alfinolib-1554698:8169221"
+    //implementation files("build/test/alfinolib-1.1.4-neoforge-1.21.1.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

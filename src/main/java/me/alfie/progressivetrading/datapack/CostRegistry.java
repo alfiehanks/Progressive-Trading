@@ -1,11 +1,12 @@
 package me.alfie.progressivetrading.datapack;
 
-import me.alfie.alfinosdatapacks.api.ClientDatapackManager;
-import me.alfie.alfinosdatapacks.api.ServerDatapackManager;
+import me.alfie.alfinolib.datapacks.ClientDatapackManager;
+import me.alfie.alfinolib.datapacks.ServerDatapackManager;
+import me.alfie.alfinolib.networking.codec.StreamCodec;
+import me.alfie.alfinolib.networking.codec.StreamCodecBuilder;
 import me.alfie.progressivetrading.datapack.codec.ItemCost;
 import me.alfie.progressivetrading.datapack.codec.LevelCost;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -14,36 +15,34 @@ import java.util.Map;
 
 public class CostRegistry {
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, CostRegistry> STREAM_CODEC =
-            StreamCodec.of(
-                    CostRegistry::encodeStream,
-                    CostRegistry::decodeStream
-            );
+    public static final StreamCodec<RegistryFriendlyByteBuf, CostRegistry> STREAM_CODEC = new StreamCodec<RegistryFriendlyByteBuf, CostRegistry>() {
+        @Override
+        public void encode(RegistryFriendlyByteBuf buf, CostRegistry costRegistry) {
+            Map<ResourceLocation, LevelCost> map = costRegistry.ID_REGISTRY;
 
-    private static CostRegistry decodeStream(RegistryFriendlyByteBuf buf) {
-        int size = buf.readVarInt();
+            buf.writeVarInt(map.size());
 
-        Map<ResourceLocation, LevelCost> map = new HashMap<>(size);
-
-        for (int i = 0; i < size; i++) {
-            ResourceLocation id = buf.readResourceLocation();
-            LevelCost levelCost = LevelCost.STREAM_CODEC.decode(buf);
-            map.put(id, levelCost);
+            for (Map.Entry<ResourceLocation, LevelCost> entry : map.entrySet()) {
+                buf.writeResourceLocation(entry.getKey());
+                LevelCost.STREAM_CODEC.encode(buf, entry.getValue());
+            }
         }
 
-        return new CostRegistry(map);
-    }
+        @Override
+        public CostRegistry decode(RegistryFriendlyByteBuf buf) {
+            int size = buf.readVarInt();
 
-    private static void encodeStream(RegistryFriendlyByteBuf buf, CostRegistry value) {
-        Map<ResourceLocation, LevelCost> map = value.ID_REGISTRY;
+            Map<ResourceLocation, LevelCost> map = new HashMap<>(size);
 
-        buf.writeVarInt(map.size());
+            for (int i = 0; i < size; i++) {
+                ResourceLocation id = buf.readResourceLocation();
+                LevelCost levelCost = LevelCost.STREAM_CODEC.decode(buf);
+                map.put(id, levelCost);
+            }
 
-        for (Map.Entry<ResourceLocation, LevelCost> entry : map.entrySet()) {
-            buf.writeResourceLocation(entry.getKey());
-            LevelCost.STREAM_CODEC.encode(buf, entry.getValue());
+            return new CostRegistry(map);
         }
-    }
+    };
 
     private final Map<ResourceLocation, LevelCost> ID_REGISTRY = new HashMap<>();
 
