@@ -7,6 +7,7 @@ import me.alfie.alfinolib.datapacks.ModDatapack;
 import me.alfie.progressivetrading.ProgressiveTrading;
 import me.alfie.progressivetrading.datapack.codec.ItemCost;
 import me.alfie.progressivetrading.datapack.codec.LevelCost;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -24,8 +25,8 @@ public class CostDatapack extends ModDatapack<LevelCost, CostRegistry> {
 
     private CostRegistry DATA = new CostRegistry(new HashMap<>());
 
-     public CostDatapack() {
-        super(LevelCost.CODEC, KEY, CostRegistry.STREAM_CODEC);
+     public CostDatapack(RegistryAccess registryAccess) {
+        super(LevelCost.CODEC, KEY, CostRegistry.STREAM_CODEC, registryAccess);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class CostDatapack extends ModDatapack<LevelCost, CostRegistry> {
     }
 
     public static void register(AddReloadListenerEvent event) {
-        DatapackRegistry.register(event, CostDatapack::new);
+        DatapackRegistry.register(event, () -> new CostDatapack(event.getRegistryAccess()));
         System.out.println(DatapackRegistry.get(KEY));
     }
 }

@@ -126,7 +126,7 @@ configurations {
 }
 
 dependencies {
-    compileOnly "curse.maven:alfinolib-1554698:8169221"
+    compileOnly "curse.maven:alfinolib-1554698:8169842"
     //implementation files("build/test/alfinolib-1.1.4-neoforge-1.21.1.jar")
 }
 
