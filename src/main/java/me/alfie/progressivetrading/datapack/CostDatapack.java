@@ -1,6 +1,7 @@
 package me.alfie.progressivetrading.datapack;
 
 import com.google.gson.JsonElement;
+import me.alfie.alfinolib.datapacks.DatapackDefinition;
 import me.alfie.alfinolib.datapacks.DatapackKey;
 import me.alfie.alfinolib.datapacks.DatapackRegistry;
 import me.alfie.alfinolib.datapacks.ModDatapack;
@@ -20,13 +21,13 @@ import java.util.Map;
 
 public class CostDatapack extends ModDatapack<LevelCost, CostRegistry> {
 
-    public static final DatapackKey<CostRegistry> KEY =
-            new DatapackKey<>(ProgressiveTrading.MODID, "costs");
+    public static final DatapackKey<CostRegistry> KEY = new DatapackKey<>(ProgressiveTrading.MODID, "costs");
+    public static final DatapackDefinition<CostRegistry> DEFINITION = new DatapackDefinition<>(KEY, CostRegistry.STREAM_CODEC);
 
     private CostRegistry DATA = new CostRegistry(new HashMap<>());
 
      public CostDatapack(RegistryAccess registryAccess) {
-        super(LevelCost.CODEC, KEY, CostRegistry.STREAM_CODEC, registryAccess);
+        super(LevelCost.CODEC, DEFINITION, registryAccess);
     }
 
     @Override
@@ -66,10 +67,5 @@ public class CostDatapack extends ModDatapack<LevelCost, CostRegistry> {
         String subPath = path.substring(firstSlash + 1);
 
         return ResourceLocation.fromNamespaceAndPath(namespace, subPath);
-    }
-
-    public static void register(AddReloadListenerEvent event) {
-        DatapackRegistry.register(event, () -> new CostDatapack(event.getRegistryAccess()));
-        System.out.println(DatapackRegistry.get(KEY));
     }
 }

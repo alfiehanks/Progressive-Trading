@@ -1,7 +1,8 @@
 package me.alfie.progressivetrading.datapack;
 
-import me.alfie.alfinolib.datapacks.ClientDatapackManager;
-import me.alfie.alfinolib.datapacks.ServerDatapackManager;
+
+import me.alfie.alfinolib.datapacks.client.ClientDatapackManager;
+import me.alfie.alfinolib.datapacks.server.ServerDatapackManager;
 import me.alfie.alfinolib.networking.codec.StreamCodec;
 import me.alfie.alfinolib.networking.codec.StreamCodecBuilder;
 import me.alfie.progressivetrading.datapack.codec.ItemCost;

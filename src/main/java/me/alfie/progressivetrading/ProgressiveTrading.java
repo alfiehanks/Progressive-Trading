@@ -1,6 +1,7 @@
 package me.alfie.progressivetrading;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import me.alfie.alfinolib.datapacks.DatapackRegistry;
 import me.alfie.alfinolib.networking.NetworkRegisterEvent;
 import me.alfie.alfinolib.networking.Networking;
 import me.alfie.progressivetrading.datapack.CostDatapack;
@@ -49,7 +50,7 @@ public class ProgressiveTrading {
         ModEvents.register(modEventBus);
         ModMenus.register(modEventBus);
 
-        NeoForge.EVENT_BUS.addListener(CostDatapack::register);
+        DatapackRegistry.register(CostDatapack.DEFINITION, CostDatapack::new);
         modEventBus.addListener(ProgressiveTrading::registerPackets);
     }
 
